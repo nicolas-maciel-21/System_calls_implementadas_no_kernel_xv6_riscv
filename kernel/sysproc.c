@@ -110,3 +110,33 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+struct utsname {
+	char sysname[32];
+	char nodename[32];
+	char release[32];
+	char version[32];
+	char machine[32];
+};
+
+uint64
+sys_uname(void){
+	uint64 addr;
+	struct utsname un;
+	
+	argaddr(0, &addr);
+
+	safestrcpy(un.sysname, "xv6", sizeof(un.sysname));
+	safestrcpy(un.nodename, "riscv-node", sizeof(un.nodename));
+	safestrcpy(un.release, "1.0", sizeof(un.release));
+	safestrcpy(un.version, "xv6-riscv-ext", sizeof(un.version));
+	safestrcpy(un.machine, "RISC-V", sizeof(un.machine));
+
+	if(copyout(myproc()->pagetable, myproc()->sz, addr, (char*)&un, sizeof(un)) < 0){ 
+	 return -1;
+	}
+
+	return 0;
+}
+
+

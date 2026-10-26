@@ -41,6 +41,6 @@ entry("dup");
 entry("getpid");
 entry("sbrk");
 entry("pause");
-entry("uptime");
 entry("sync");
 entry("uname");
+entry("uptime");

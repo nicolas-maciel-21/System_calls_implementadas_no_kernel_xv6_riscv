@@ -7,6 +7,14 @@
 #include "proc.h"
 #include "vm.h"
 
+struct uptime_info{
+  uint64 ticks;
+  uint64 seconds;
+  uint64 procs;
+};
+
+extern struct proc proc[];
+
 uint64
 sys_exit(void)
 {
@@ -100,16 +108,7 @@ sys_kill(void)
 
 // return how many clock tick interrupts have occurred
 // since start.
-uint64
-sys_uptime(void)
-{
-  uint xticks;
 
-  acquire(&tickslock);
-  xticks = ticks;
-  release(&tickslock);
-  return xticks;
-}
 
 struct utsname {
 	char sysname[32];
@@ -139,4 +138,33 @@ sys_uname(void){
 	return 0;
 }
 
+uint64
+sys_uptime(void){
+	uint64 addr;
+	struct uptime_info info;
+	struct proc *p;
+
+	if(argaddr(0, &addr) < 0)
+	  return -1;
+
+	acquire(&tickslock);
+	info.ticks = ticks;
+	release(&tickslock);
+	info.seconds = info.ticks / 10;
+
+	info.procs = 0;
+	for(p = proc; p < &proc[NPROC]; p++){
+	  acquire(&p->lock);
+	  if(p->state != UNUSED) {
+	    info.procs++;
+	  }
+	  release(&p->lock);
+	}
+
+	if(copyout(myproc()->pagetable, myproc()->sz, addr, (char *)&info, sizeof(info)) < 0)
+	  return -1;
+
+	
+	return 0;
+}
 

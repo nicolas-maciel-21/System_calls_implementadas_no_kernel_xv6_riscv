@@ -24,7 +24,6 @@ int dup(int);
 int getpid(void);
 char *sys_sbrk(int, int);
 int pause(int);
-int uptime(void);
 int sync(void);
 int uname(struct utsname *);
 
@@ -50,3 +49,13 @@ void printf(const char *, ...) __attribute__((format(printf, 1, 2)));
 // umalloc.c
 void *malloc(uint);
 void free(void *);
+
+struct uptime_info {
+
+   uint64 ticks;
+   uint64 seconds;
+   uint64 procs;
+};
+
+int uptime(struct uptime_info *info);
+

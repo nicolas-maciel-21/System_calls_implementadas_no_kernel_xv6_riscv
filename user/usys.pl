@@ -45,3 +45,5 @@ entry("sync");
 entry("uname");
 entry("uptime");
 entry("trace");
+entry("sysinfo");
+

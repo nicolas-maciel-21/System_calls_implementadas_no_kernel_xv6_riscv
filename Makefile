@@ -154,6 +154,7 @@ UPROGS=\
 	$U/_uname\
         $U/_uptime\
         $U/_trace\
+	$U/_sysinfo\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

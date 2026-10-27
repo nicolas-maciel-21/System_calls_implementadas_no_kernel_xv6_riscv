@@ -60,3 +60,6 @@ struct uptime_info {
 
 int uptime(struct uptime_info *info);
 
+struct sysinfo;
+int sysinfo(struct sysinfo*);
+

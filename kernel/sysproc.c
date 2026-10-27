@@ -6,6 +6,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "vm.h"
+#include "kernel/sysinfo.h"
 
 struct uptime_info{
   uint64 ticks;
@@ -186,4 +187,26 @@ sys_trace(void){
   //Guarda a mascara do processo atual
   myproc()->mask = mask;
   return 0;
+}
+
+uint64
+sys_sysinfo(void){
+
+	uint64 addr; //Endereço do ponteiro passado
+	struct sysinfo info;
+
+	//Obtem o ponteiro passado para sysinfo()
+	if(argaddr(0, &addr) < 0)
+	  return -1;
+
+	//Preenche com os dados do kernel
+	info.freemem = freemem();
+	info.nproc = nproc();
+
+	//Copia os dados para a memória do processo
+	
+	if(copyout(myproc()->pagetable,myproc()->sz, addr, (char *)&info, sizeof(info)) < 0)
+	  return -1;
+
+	return 0;
 }

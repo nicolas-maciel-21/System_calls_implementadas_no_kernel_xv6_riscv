@@ -123,8 +123,10 @@ sys_uname(void){
 	uint64 addr;
 	struct utsname un;
 	
+	//Lê o ponteiro
 	argaddr(0, &addr);
 
+	//Preenche os campos de utsname
 	safestrcpy(un.sysname, "xv6", sizeof(un.sysname));
 	safestrcpy(un.nodename, "riscv-node", sizeof(un.nodename));
 	safestrcpy(un.release, "1.0", sizeof(un.release));
@@ -143,15 +145,18 @@ sys_uptime(void){
 	uint64 addr;
 	struct uptime_info info;
 	struct proc *p;
-
+	
+	//Obtem endereço do ponteiro 
 	if(argaddr(0, &addr) < 0)
 	  return -1;
-
-	acquire(&tickslock);
+	
+        //Obtem tempo de atividade  
+        acquire(&tickslock);
 	info.ticks = ticks;
 	release(&tickslock);
 	info.seconds = info.ticks / 10;
 
+        //Conta processos ativos
 	info.procs = 0;
 	for(p = proc; p < &proc[NPROC]; p++){
 	  acquire(&p->lock);
@@ -160,7 +165,8 @@ sys_uptime(void){
 	  }
 	  release(&p->lock);
 	}
-
+	
+	//Copia para espaço de usuario
 	if(copyout(myproc()->pagetable, myproc()->sz, addr, (char *)&info, sizeof(info)) < 0)
 	  return -1;
 
@@ -168,3 +174,16 @@ sys_uptime(void){
 	return 0;
 }
 
+uint64
+sys_trace(void){
+
+  int mask;
+
+  //Lê o argumento passado pelo usuário
+  if (argint(0, &mask) < 0)
+    return -1;
+
+  //Guarda a mascara do processo atual
+  myproc()->mask = mask;
+  return 0;
+}

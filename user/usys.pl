@@ -44,3 +44,4 @@ entry("pause");
 entry("sync");
 entry("uname");
 entry("uptime");
+entry("trace");

@@ -7,6 +7,8 @@
 #include "syscall.h"
 #include "defs.h"
 
+extern void printf(char*,...);
+
 // Fetch the uint64 at addr from the current process.
 int
 fetchaddr(uint64 addr, uint64 *ip)
@@ -106,6 +108,7 @@ extern uint64 sys_close(void);
 extern uint64 sys_sync(void);
 extern uint64 sys_uname(void);
 extern uint64 sys_uptime(void);
+extern uint64 sys_trace(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -135,7 +138,26 @@ static uint64 (*syscalls[])(void) = {
   [SYS_sync]    = sys_sync,
   [SYS_uname]   = sys_uname,
   [SYS_uptime]  = sys_uptime,
+  [SYS_trace]   = sys_trace,
   // clang-format on
+};
+  static char *sysnames[] =
+ {
+  [SYS_fork]   = "fork",
+  [SYS_exit]   = "exit",
+  [SYS_wait]   = "wait",
+  [SYS_pipe]   = "pipe",
+  [SYS_read]   = "read",
+  [SYS_kill]   = "kill",
+  [SYS_exec]   = "exec",
+  [SYS_fstat]  = "fstat",
+  [SYS_chdir]  = "chdir",
+  [SYS_dup]    = "dup",
+  [SYS_getpid] = "getpid",
+  [SYS_sbrk]   = "sbrk",
+  [SYS_uname]  = "uname",
+  [SYS_uptime] = "uptime",
+  [SYS_trace]  = "trace",
 };
 
 void
@@ -149,6 +171,12 @@ syscall(void)
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0
     p->trapframe->a0 = syscalls[num]();
+
+    //Verifica o trace, conferindo se o bit correspondente a syscall esta ativo na mascara
+    if((p->mask & (1 << num)) != 0){
+      printk("%d: syscall %s -> %d\n",
+	     p->pid, sysnames[num],(int)p->trapframe->a0);
+    }
   } else {
     printk("%d %s: unknown sys call %d\n", p->pid, p->name, num);
     p->trapframe->a0 = -1;

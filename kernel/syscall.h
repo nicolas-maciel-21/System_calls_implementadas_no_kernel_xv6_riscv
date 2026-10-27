@@ -22,3 +22,4 @@
 #define SYS_sync   21
 #define SYS_uname  22
 #define SYS_uptime 23
+#define SYS_trace  24

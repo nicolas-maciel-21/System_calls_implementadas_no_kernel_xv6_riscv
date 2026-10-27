@@ -26,6 +26,7 @@ char *sys_sbrk(int, int);
 int pause(int);
 int sync(void);
 int uname(struct utsname *);
+int trace(int);
 
 // ulib.c
 int stat(const char *, struct stat *);

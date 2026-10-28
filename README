@@ -1,3 +1,36 @@
+# Implementação de System Calls no Kernel xv6-RISC-V
+
+Este repositório contém a implementação de quatro novas system calls personalizadas: "trace", "uname", "uptime" e "sysinfo".
+
+---
+## Detalhes das System Calls
+
+1. "trace"
+Intercepta e regista no terminal as chamadas de sistema efetuadas por um processo com base numa máscara de bits.
+* *Uso: "trace [máscara] [comando]"
+
+2. "uname"
+Preenche uma estrutura no espaço de usuário com dados de identificação do sistema operativo.
+Informações retornadas: Nome do kernel, nó, versão e arquitetura.
+
+3. "uptime"
+Consulta o contador global de ticks e retorna estatísticas de tempo de execução e contagem de processos em execução.
+
+4. "sysinfo"
+Acessa diretamente as estruturas internas do kernel (kalloc e tabela de processos proc[]) para calcular a memória livre real (em bytes) e o número de processos ativos.
+
+---
+
+## Principais arquivos Modificados
+
+* "kernel/syscall.h" / "kernel/syscall.c": Mapeamento de IDs e suporte ao "trace".
+* "kernel/sysproc.c": Lógica principal das chamadas "sys_trace", "sys_uname", "sys_uptime" e "sys_sysinfo".
+* "kernel/kalloc.c" / "kernel/proc.c": Funções auxiliares para contagem de memória livre e processos ativos.
+* "user/user.h" / "user/usys.pl": Stubs e declarações de funções para o espaço de usuário.
+
+---
+
+
 xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
 Version 6 (v6).  xv6 loosely follows the structure and style of v6,
 but is implemented for a modern RISC-V multiprocessor using ANSI C.

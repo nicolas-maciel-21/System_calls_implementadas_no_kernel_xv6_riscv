@@ -53,13 +53,12 @@ void free(void *);
 
 struct uptime_info {
 
-   uint64 ticks;
-   uint64 seconds;
-   uint64 procs;
+  uint64 ticks;
+  uint64 seconds;
+  uint64 procs;
 };
 
 int uptime(struct uptime_info *info);
 
 struct sysinfo;
-int sysinfo(struct sysinfo*);
-
+int sysinfo(struct sysinfo *);

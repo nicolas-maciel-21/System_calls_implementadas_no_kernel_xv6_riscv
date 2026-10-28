@@ -7,7 +7,7 @@
 #include "syscall.h"
 #include "defs.h"
 
-extern void printf(char*,...);
+extern void printf(char *, ...);
 
 // Fetch the uint64 at addr from the current process.
 int
@@ -69,7 +69,7 @@ int
 argaddr(int n, uint64 *ip)
 {
   *ip = argraw(n);
-  return 0 ;
+  return 0;
 }
 
 // Fetch the nth word-sized system call argument as a null-terminated string.
@@ -144,23 +144,12 @@ static uint64 (*syscalls[])(void) = {
 
   // clang-format on
 };
-  static char *sysnames[] =
- {
-  [SYS_fork]   = "fork",
-  [SYS_exit]   = "exit",
-  [SYS_wait]   = "wait",
-  [SYS_pipe]   = "pipe",
-  [SYS_read]   = "read",
-  [SYS_kill]   = "kill",
-  [SYS_exec]   = "exec",
-  [SYS_fstat]  = "fstat",
-  [SYS_chdir]  = "chdir",
-  [SYS_dup]    = "dup",
-  [SYS_getpid] = "getpid",
-  [SYS_sbrk]   = "sbrk",
-  [SYS_uname]  = "uname",
-  [SYS_uptime] = "uptime",
-  [SYS_trace]  = "trace",
+static char *sysnames[] = {
+  [SYS_fork] = "fork",   [SYS_exit] = "exit",     [SYS_wait] = "wait",
+  [SYS_pipe] = "pipe",   [SYS_read] = "read",     [SYS_kill] = "kill",
+  [SYS_exec] = "exec",   [SYS_fstat] = "fstat",   [SYS_chdir] = "chdir",
+  [SYS_dup] = "dup",     [SYS_getpid] = "getpid", [SYS_sbrk] = "sbrk",
+  [SYS_uname] = "uname", [SYS_uptime] = "uptime", [SYS_trace] = "trace",
 };
 
 void
@@ -176,9 +165,9 @@ syscall(void)
     p->trapframe->a0 = syscalls[num]();
 
     //Verifica o trace, conferindo se o bit correspondente a syscall esta ativo na mascara
-    if((p->mask & (1 << num)) != 0){
-      printk("%d: syscall %s -> %d\n",
-	     p->pid, sysnames[num],(int)p->trapframe->a0);
+    if ((p->mask & (1 << num)) != 0) {
+      printk("%d: syscall %s -> %d\n", p->pid, sysnames[num],
+             (int)p->trapframe->a0);
     }
   } else {
     printk("%d %s: unknown sys call %d\n", p->pid, p->name, num);

@@ -8,7 +8,7 @@
 #include "vm.h"
 #include "kernel/sysinfo.h"
 
-struct uptime_info{
+struct uptime_info {
   uint64 ticks;
   uint64 seconds;
   uint64 procs;
@@ -110,73 +110,76 @@ sys_kill(void)
 // return how many clock tick interrupts have occurred
 // since start.
 
-
 struct utsname {
-	char sysname[32];
-	char nodename[32];
-	char release[32];
-	char version[32];
-	char machine[32];
+  char sysname[32];
+  char nodename[32];
+  char release[32];
+  char version[32];
+  char machine[32];
 };
 
 uint64
-sys_uname(void){
-	uint64 addr;
-	struct utsname un;
-	
-	//Lê o ponteiro
-	argaddr(0, &addr);
+sys_uname(void)
+{
+  uint64 addr;
+  struct utsname un;
 
-	//Preenche os campos de utsname
-	safestrcpy(un.sysname, "xv6", sizeof(un.sysname));
-	safestrcpy(un.nodename, "riscv-node", sizeof(un.nodename));
-	safestrcpy(un.release, "1.0", sizeof(un.release));
-	safestrcpy(un.version, "xv6-riscv-ext", sizeof(un.version));
-	safestrcpy(un.machine, "RISC-V", sizeof(un.machine));
+  //Lê o ponteiro
+  argaddr(0, &addr);
 
-	if(copyout(myproc()->pagetable, myproc()->sz, addr, (char*)&un, sizeof(un)) < 0){ 
-	 return -1;
-	}
+  //Preenche os campos de utsname
+  safestrcpy(un.sysname, "xv6", sizeof(un.sysname));
+  safestrcpy(un.nodename, "riscv-node", sizeof(un.nodename));
+  safestrcpy(un.release, "1.0", sizeof(un.release));
+  safestrcpy(un.version, "xv6-riscv-ext", sizeof(un.version));
+  safestrcpy(un.machine, "RISC-V", sizeof(un.machine));
 
-	return 0;
+  if (copyout(myproc()->pagetable, myproc()->sz, addr, (char *)&un,
+              sizeof(un)) < 0) {
+    return -1;
+  }
+
+  return 0;
 }
 
 uint64
-sys_uptime(void){
-	uint64 addr;
-	struct uptime_info info;
-	struct proc *p;
-	
-	//Obtem endereço do ponteiro 
-	if(argaddr(0, &addr) < 0)
-	  return -1;
-	
-        //Obtem tempo de atividade  
-        acquire(&tickslock);
-	info.ticks = ticks;
-	release(&tickslock);
-	info.seconds = info.ticks / 10;
+sys_uptime(void)
+{
+  uint64 addr;
+  struct uptime_info info;
+  struct proc *p;
 
-        //Conta processos ativos
-	info.procs = 0;
-	for(p = proc; p < &proc[NPROC]; p++){
-	  acquire(&p->lock);
-	  if(p->state != UNUSED) {
-	    info.procs++;
-	  }
-	  release(&p->lock);
-	}
-	
-	//Copia para espaço de usuario
-	if(copyout(myproc()->pagetable, myproc()->sz, addr, (char *)&info, sizeof(info)) < 0)
-	  return -1;
+  //Obtem endereço do ponteiro
+  if (argaddr(0, &addr) < 0)
+    return -1;
 
-	
-	return 0;
+  //Obtem tempo de atividade
+  acquire(&tickslock);
+  info.ticks = ticks;
+  release(&tickslock);
+  info.seconds = info.ticks / 10;
+
+  //Conta processos ativos
+  info.procs = 0;
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state != UNUSED) {
+      info.procs++;
+    }
+    release(&p->lock);
+  }
+
+  //Copia para espaço de usuario
+  if (copyout(myproc()->pagetable, myproc()->sz, addr, (char *)&info,
+              sizeof(info)) < 0)
+    return -1;
+
+  return 0;
 }
 
 uint64
-sys_trace(void){
+sys_trace(void)
+{
 
   int mask;
 
@@ -190,23 +193,25 @@ sys_trace(void){
 }
 
 uint64
-sys_sysinfo(void){
+sys_sysinfo(void)
+{
 
-	uint64 addr; //Endereço do ponteiro passado
-	struct sysinfo info;
+  uint64 addr; //Endereço do ponteiro passado
+  struct sysinfo info;
 
-	//Obtem o ponteiro passado para sysinfo()
-	if(argaddr(0, &addr) < 0)
-	  return -1;
+  //Obtem o ponteiro passado para sysinfo()
+  if (argaddr(0, &addr) < 0)
+    return -1;
 
-	//Preenche com os dados do kernel
-	info.freemem = freemem();
-	info.nproc = nproc();
+  //Preenche com os dados do kernel
+  info.freemem = freemem();
+  info.nproc = nproc();
 
-	//Copia os dados para a memória do processo
-	
-	if(copyout(myproc()->pagetable,myproc()->sz, addr, (char *)&info, sizeof(info)) < 0)
-	  return -1;
+  //Copia os dados para a memória do processo
 
-	return 0;
+  if (copyout(myproc()->pagetable, myproc()->sz, addr, (char *)&info,
+              sizeof(info)) < 0)
+    return -1;
+
+  return 0;
 }
